@@ -498,4 +498,3 @@ ID_Equipo,Tipo_Equipo,Fabricante,Modelo,Frecuencia_Correctivo,Frecuencia_Prevent
 497,Compresor,GE,M400,130,100,99846.0,230
 498,Generador,Siemens,X100,250,275,96724.0,525
 499,Motor,Siemens,Y200,90,135,85233.0,225
-500,Transformador,GE,M400,0,0,,0
