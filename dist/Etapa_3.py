@@ -54,7 +54,7 @@ ruta = 'c:/repo_remoto/'
 # ## Integración
 
 # %% [markdown]
-# #### Los archivo provienen de la etapa 2 y ya están limpios y preprocesados
+# #### Los archivo provienen de la etapa 2 en la carpeta output y ya están limpios y preprocesados
 
 # %% [markdown]
 # ### Carga de archivos
@@ -81,6 +81,7 @@ condiciones_df = pd.DataFrame(condiciones)
 ordenes_df = ordenes_df.drop(columns=['ID_Orden']).set_index('Fecha')
 
 # %%
+# Añado columna de la semana
 # Asegurarse de que el índice sea de tipo DatetimeIndex
 ordenes_df.index = pd.to_datetime(ordenes_df.index)
 
@@ -98,6 +99,7 @@ ordenes_df
 condiciones_df = condiciones_df.drop(columns=['ID_Registro']).set_index('Fecha')
 
 # %%
+# Añado columna de semana
 # Asegurarse de que el índice sea de tipo DatetimeIndex
 condiciones_df.index = pd.to_datetime(condiciones_df.index)
 
@@ -108,7 +110,7 @@ condiciones_df['Semana'] = condiciones_df.index.isocalendar().year.astype(str) +
 condiciones_df
 
 # %% [markdown]
-# ### merge
+# ### Merge
 
 # %%
 # Mezclo los dataframes por la columna 'ID_Equipo'
@@ -119,6 +121,8 @@ merged_df
 merged_df.info()
 
 # %%
+# Agrego por rangos de semana imputando la media de las columnas especificadas
+
 # Agrupar por Semana, ID_Equipo, Tipo_Mantenimiento y Ubicacion, y calcular la media de las columnas especificadas
 columnas_a_promediar = ['Costo_Mantenimiento', 'Duracion_Horas', 'Temperatura_C', 'Vibracion_mm_s', 'Horas_Operativas']
 merged_df = merged_df.groupby(['Semana_x', 'Semana_y', 'ID_Equipo', 'Tipo_Mantenimiento', 'Ubicacion'])[columnas_a_promediar].mean().reset_index()
@@ -310,7 +314,7 @@ profile.to_file(ruta + 'Etapa3/output/Mantenimiento.html')
 # ### Definición del Target
 
 # %%
-mantenimiento_df = merged_df
+mantenimiento_df = pd.read_csv(ruta + 'Etapa3/output/Mantenimiento.csv')
 
 # %%
 target_column = "Tipo_Mantenimiento"
@@ -822,7 +826,7 @@ for name, pipeline in pipelines.items():
 # Este notebook realiza un análisis completo de datos relacionados con el mantenimiento de equipos, desde la preparación de los datos hasta la evaluación de modelos de clasificación.
 # A continuación, se resume cada sección:
 # 
-# 1. Carga y preparación de datos
+# 1. **Carga y preparación de datos**
 # Se importan librerías necesarias y herramientas de scikit-learn.
 # Se cargan varios archivos CSV relacionados con características de equipos, históricos de órdenes y registros de condiciones.
 # Se procesan los datos:
@@ -831,20 +835,21 @@ for name, pipeline in pipelines.items():
 # Se agrupan y combinan los datos en un único DataFrame (merged_df).
 # Se añaden nuevas características como frecuencias de mantenimiento correctivo, preventivo, por ubicación y potencia.
 # 
-# 2. Limpieza de datos
+# 2. **Limpieza de datos**
 # Se verifican y rellenan valores faltantes.
 # Se eliminan duplicados.
+# Se verifican outliers.
 # Se transforman columnas categóricas en valores numéricos usando LabelEncoder.
 # 
-# 3. Selección de características
+# 3. **Selección de características**
 # Se evalúa la importancia de las características utilizando SelectKBest y se seleccionan las más relevantes.
 # Se eliminan características con baja varianza.
 # 
-# 4. División de datos
+# 4. **División de datos**
 # Se separan los datos en características (X) y la variable objetivo (y), que es el tipo de mantenimiento.
 # Se dividen los datos en conjuntos de entrenamiento y prueba (80%-20%).
 # 
-# 5. Modelos candidatos
+# 5. **Modelos candidatos**
 # Se definen cuatro modelos de clasificación como candidatos:
 # LogisticRegression
 # RandomForestClassifier
@@ -852,17 +857,17 @@ for name, pipeline in pipelines.items():
 # KNeighborsClassifier
 # Se crean pipelines para cada modelo, incluyendo preprocesamiento (escalado y codificación).
 # 
-# 6. Evaluación inicial
+# 6. **Evaluación inicial**
 # Se realiza validación cruzada para evaluar el desempeño de cada modelo en términos de precisión (accuracy) y puntaje F1.
 # Se generan curvas de aprendizaje para analizar el comportamiento de los modelos con diferentes tamaños de datos de entrenamiento.
 # 
-# 7. Curvas de validación
+# 7. **Curvas de validación**
 # Se generan curvas de validación para ajustar hiperparámetros clave de los modelos, como C para regresión logística, min_samples_split para Random Forest, y otros.
 # 
-# 8. Afinación de hiperparámetros
+# 8. **Afinación de hiperparámetros**
 # Se utiliza GridSearchCV para buscar los mejores hiperparámetros para cada modelo.
 # 
-# 9. Reentrenamiento y evaluación final
+# 9. **Reentrenamiento y evaluación final**
 # Los modelos se reentrenan con los mejores hiperparámetros encontrados.
 # Se evalúan nuevamente para comparar su desempeño final.
 # 
@@ -873,7 +878,7 @@ for name, pipeline in pipelines.items():
 # En resumen, este notebook realiza un flujo completo de análisis de datos, selección de características, entrenamiento y evaluación de modelos de clasificación para predecir el tipo de mantenimiento de equipos.
 
 # %% [markdown]
-# ## Conclusiones
+# ## Conclusiones y elección de MODELO
 
 # %% [markdown]
 # **Resumen y elección del modelo**
